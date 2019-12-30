@@ -12,6 +12,7 @@ import net.corda.core.utilities.ProgressTracker.Step
 import net.corda.core.utilities.seconds
 import net.corda.examples.obligation.Obligation
 import net.corda.examples.obligation.ObligationContract
+import net.corda.examples.obligation.ObligationContract.Stage
 import net.corda.examples.obligation.ObligationContract.Companion.OBLIGATION_CONTRACT_ID
 import java.util.*
 
@@ -20,7 +21,7 @@ object IssueObligation {
     @StartableByRPC
     class Initiator(private val amount: Amount<Currency>,
                     private val lender: Party,
-                    private val anonymous: Boolean = true) : ObligationBaseFlow() {
+                    private val anonymous: Boolean = false) : ObligationBaseFlow() {
 
         companion object {
             object INITIALISING : Step("Performing initial steps.")
@@ -42,7 +43,8 @@ object IssueObligation {
         override fun call(): SignedTransaction {
             // Step 1. Initialisation.
             progressTracker.currentStep = INITIALISING
-            val obligation = if (anonymous) createAnonymousObligation() else Obligation(amount, lender, ourIdentity)
+            val stage = Stage.STATE_1
+            val obligation = if (anonymous) createAnonymousObligation() else Obligation(amount, lender, ourIdentity,stage)
             val ourSigningKey = obligation.borrower.owningKey
 
             // Step 2. Building.
@@ -79,8 +81,8 @@ object IssueObligation {
 
             val anonymousMe = txKeys[ourIdentity] ?: throw FlowException("Couldn't create our conf. identity.")
             val anonymousLender = txKeys[lender] ?: throw FlowException("Couldn't create lender's conf. identity.")
-
-            return Obligation(amount, anonymousLender, anonymousMe)
+            val stage = Stage.STATE_1
+            return Obligation(amount, anonymousLender, anonymousMe, stage)
         }
     }
 

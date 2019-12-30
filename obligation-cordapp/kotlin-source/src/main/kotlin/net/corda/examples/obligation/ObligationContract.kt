@@ -5,6 +5,9 @@ import net.corda.core.transactions.LedgerTransaction
 import net.corda.finance.contracts.asset.Cash
 import net.corda.finance.utils.sumCash
 import java.security.PublicKey
+import net.corda.core.serialization.CordaSerializable
+import net.corda.core.serialization.CordaSerializationTransformEnumDefault
+import net.corda.core.serialization.CordaSerializationTransformEnumDefaults
 
 class ObligationContract : Contract {
 
@@ -12,6 +15,19 @@ class ObligationContract : Contract {
         @JvmStatic
         val OBLIGATION_CONTRACT_ID = "net.corda.examples.obligation.ObligationContract"
     }
+
+    @CordaSerializable
+    @CordaSerializationTransformEnumDefaults(
+            CordaSerializationTransformEnumDefault("NEW_LIFECYCLE", "STATE_1")
+    )
+    enum class Stage(val level: Long){
+        STATE_1(10L),
+        STATE_2(20L),
+        STATE_3(30L),
+        NEW_LIFECYCLE(5L);
+    }
+
+
 
     interface Commands : CommandData {
         class Issue : TypeOnlyCommandData(), Commands

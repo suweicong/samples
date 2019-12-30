@@ -12,6 +12,7 @@ import java.util.*
 data class Obligation(val amount: Amount<Currency>,
                       val lender: AbstractParty,
                       val borrower: AbstractParty,
+                      val stage: ObligationContract.Stage,
                       val paid: Amount<Currency> = Amount(0, amount.token),
                       override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState {
 

@@ -20,6 +20,8 @@ import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.Response.Status.BAD_REQUEST
 import javax.ws.rs.core.Response.Status.CREATED
+import net.corda.examples.obligation.ObligationContract
+
 
 @Path("obligation")
 class ObligationApi(val rpcOps: CordaRPCOps) {
@@ -47,25 +49,25 @@ class ObligationApi(val rpcOps: CordaRPCOps) {
             .groupBy({ amount -> amount.token }, { (quantity) -> quantity })
             .mapValues { it.value.sum() }
 
-    @GET
-    @Path("obligations")
-    @Produces(MediaType.APPLICATION_JSON)
-    fun obligations(): List<Obligation> {
-        val statesAndRefs = rpcOps.vaultQuery(Obligation::class.java).states
-        return statesAndRefs
-                .map { stateAndRef -> stateAndRef.state.data }
-                .map { state ->
-                    // We map the anonymous lender and borrower to well-known identities if possible.
-                    val possiblyWellKnownLender = rpcOps.wellKnownPartyFromAnonymous(state.lender) ?: state.lender
-                    val possiblyWellKnownBorrower = rpcOps.wellKnownPartyFromAnonymous(state.borrower) ?: state.borrower
-
-                    Obligation(state.amount,
-                            possiblyWellKnownLender,
-                            possiblyWellKnownBorrower,
-                            state.paid,
-                            state.linearId)
-                }
-    }
+//    @GET
+//    @Path("obligations")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    fun obligations(): List<Obligation> {
+//        val statesAndRefs = rpcOps.vaultQuery(Obligation::class.java).states
+//        return statesAndRefs
+//                .map { stateAndRef -> stateAndRef.state.data }
+//                .map { state ->
+//                    // We map the anonymous lender and borrower to well-known identities if possible.
+//                    val possiblyWellKnownLender = rpcOps.wellKnownPartyFromAnonymous(state.lender) ?: state.lender
+//                    val possiblyWellKnownBorrower = rpcOps.wellKnownPartyFromAnonymous(state.borrower) ?: state.borrower
+//
+//                    Obligation(state.amount,
+//                            possiblyWellKnownLender,
+//                            possiblyWellKnownBorrower,
+//                            state.paid,
+//                            state.linearId)
+//                }
+//    }
 
     @GET
     @Path("cash")
